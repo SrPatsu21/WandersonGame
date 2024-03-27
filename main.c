@@ -1,10 +1,21 @@
 
 #include <stdio.h> 
 #include <stdlib.h> 
-#include<unistd.h>  //linux
-// #include<windows.h> //windows
 
-#define SLEEP_TIME 1 //para windows multiplicar por 1000
+#ifdef __linux__ 
+    #include<unistd.h>
+    #define SLEEP_TIME 1
+#elif _WIN32
+    #include<windows.h>
+    #define SLEEP_TIME 1000
+    void sleep(int time){
+        Sleep(time);
+    }
+#else
+
+#endif
+
+
 
 int GameRum(int* clock);
 int GameFeatures(int* clock);
