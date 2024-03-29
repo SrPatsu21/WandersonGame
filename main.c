@@ -3,15 +3,23 @@
 #include <stdlib.h> 
 #define SCREEM_SIZE 128
 #define SCREEM_HEIGHT 8
+#define CHAR_FREE ' '
+#define CHAR_WALL '|'
+
 #ifdef __linux__ 
     #include<unistd.h>
     #define CLEAR "clear"
     #define SLEEP_TIME 1
+    #define CHAR_BORD '>'
+    #define CHAR_BLOCK '#'
 
 #elif _WIN32
     #include<windows.h>
     #define CLEAR "cls"
     #define SLEEP_TIME 1000
+    #define CHAR_BORD 205
+    #define CHAR_BLOCK 219
+
 
     void sleep(int time)
     {
@@ -64,10 +72,9 @@ int gameRum(int* clock)
 int printBord()
 {
     printf("\033[33m");
-    char c = 205;
     for (size_t i = 0; i < SCREEM_SIZE; i++)
     {
-            printf("%c", c);
+            printf("%c", ((char)CHAR_BORD));
     }
     printf("\n\033[0m");
 }
@@ -88,12 +95,12 @@ int wayGenerator(char way [SCREEM_SIZE][SCREEM_HEIGHT])
         {
             for (size_t j = 0; j < SCREEM_HEIGHT; j++)
             {
-                way[i][j] = '|';
+                way[i][j] = CHAR_WALL;
             }
         }else{
             for (size_t j = 0; j < SCREEM_HEIGHT; j++)
             {
-                way[i][j] = ' ';
+                way[i][j] = CHAR_FREE;
             }
         }
     }
@@ -136,29 +143,29 @@ int createNewCol(char way [SCREEM_SIZE][SCREEM_HEIGHT], char new_way [SCREEM_HEI
         if (r == 0)
         {
             pass_col++;
-            new_way[i] = ' ';
+            new_way[i] = CHAR_FREE;
         }else
         {
-            new_way[i] = 219;
+            new_way[i] = ((char)CHAR_BLOCK);
         }
     }
 
     if (pass_col == 0)
     {
-        new_way[(rand() % SCREEM_HEIGHT)] = ' ';
+        new_way[(rand() % SCREEM_HEIGHT)] = CHAR_FREE;
     }
     
     for (size_t i = 1; i < SCREEM_HEIGHT-1; i++)
     {
-        if (new_way[(i+1)] != ' ' && new_way[(i+1)] != ' ')
+        if (new_way[(i+1)] != CHAR_FREE && new_way[(i+1)] != CHAR_FREE)
         {
             if (rand() % 2 == 0)
             {
-                new_way[(i+1)] = ' ';
+                new_way[(i+1)] = CHAR_FREE;
             }
             else
             {
-                new_way[(i-1)] = ' ';
+                new_way[(i-1)] = CHAR_FREE;
             }
         }
     }
