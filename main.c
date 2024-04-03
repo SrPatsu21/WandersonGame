@@ -232,6 +232,6 @@ int main()
 
     gameRum(&clock);
 
-    printf("Game Over\n %s: fez um total de %i pontos", nome, clock);
+    printf("Game Over\n %s: fez um total de %i pontos \n", nome, clock);
     return 1;
 }
