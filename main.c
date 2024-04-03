@@ -10,7 +10,7 @@
 #ifdef __linux__ 
     #include<unistd.h>
     #define CLEAR "clear"
-    #define SLEEP_TIME 0.5
+    #define SLEEP_TIME 500000
     #define CHAR_BORD '>'
     #define CHAR_BLOCK '#'
 
@@ -21,7 +21,7 @@
     #define CHAR_BORD 205
     #define CHAR_BLOCK 219
 
-    void sleep(int time)
+    void usleep(int time)
     {
         Sleep(time);
     }
@@ -74,7 +74,7 @@ int gameRum(int* clock)
             gameFeatures(clock, &on, way, &aviao);
         }else
         {
-            sleep(SLEEP_TIME);
+            usleep(SLEEP_TIME);
             *clock += 1;
         }
     }
