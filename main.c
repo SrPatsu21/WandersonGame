@@ -1,6 +1,7 @@
 
 #include <stdio.h> 
 #include <stdlib.h> 
+#include <pthread.h> // Multithreading
 #define SCREEM_SIZE 128
 #define SCREEM_HEIGHT 8
 #define CHAR_FREE ' '
@@ -8,11 +9,13 @@
 #define CHAR_AIR_PLANE '@'
 
 #ifdef __linux__ 
-    #include<unistd.h>
+    #include <termios.h> // For changing terminal mode
+    #include <unistd.h>  // For changing terminal mode
     #define CLEAR "clear"
     #define SLEEP_TIME 500000
     #define CHAR_BORD '>'
     #define CHAR_BLOCK '#'
+    struct termios original; // A struct to save the original state of terminal
 
 #elif _WIN32
     #include<windows.h>
@@ -29,80 +32,84 @@
 
 #endif
 
-typedef struct Plane
+typedef struct GameInfo
 {
-    int x, y;
-} AVIAO;
+    int pos_x, pos_y, clock, runing;
+    char way [SCREEM_SIZE][SCREEM_HEIGHT];
+} GAME_INFO;
 
 //n mexer no que ta certo
-int gameRum(int* clock);
+void* gameRun(void * game_info);
 int clearScream();
 int printBord();
 //arrumar
-int gameFeatures(int* clock, int* on, char way [SCREEM_SIZE][SCREEM_HEIGHT], AVIAO* aviao);
+int gameFeatures(GAME_INFO * game);
 int wayGenerator(char way [SCREEM_SIZE][SCREEM_HEIGHT]);
 int wayUpdater(char way [SCREEM_SIZE][SCREEM_HEIGHT]);
-int wayPrinter(char way [SCREEM_SIZE][SCREEM_HEIGHT], AVIAO* aviao);
+int wayPrinter(char way [SCREEM_SIZE][SCREEM_HEIGHT], int x, int y);
 int createNewCol(char way [SCREEM_SIZE][SCREEM_HEIGHT], char new_way [SCREEM_HEIGHT]);
-int isColliding(char way [SCREEM_SIZE][SCREEM_HEIGHT], AVIAO* aviao);
-
+int isColliding(char way [SCREEM_SIZE][SCREEM_HEIGHT], int x, int y);
+void enableRAWMode();
+void disableRAWMode();
 //code
 
-int clearScream()
+int main()
 {
-    system(CLEAR);
-}
+    enableRAWMode();
+    //game
+    GAME_INFO game;
 
-int gameRum(int* clock)
-{
-    int lastclock = 0;
-    int on = 1;
-    char way [SCREEM_SIZE][SCREEM_HEIGHT];
-    wayGenerator(way);
-    //aviao init
-    AVIAO aviao;
-    aviao.x = 2;
-    aviao.y = ((int)SCREEM_HEIGHT/2);
-    while (on)
-    {
-        if (*clock != lastclock)
-        {
-            clearScream();
-            lastclock = *clock;
+    game.clock = 0;
+    game.pos_x = 2;
+    game.pos_y = ((int)SCREEM_HEIGHT/2);
+    game.runing = 0;    
 
-            //o que vai acontecer
-            gameFeatures(clock, &on, way, &aviao);
-        }else
-        {
-            usleep(SLEEP_TIME);
-            *clock += 1;
-        }
-    }
+    //thread
+    pthread_t id_gameRun, id_keyGet;
 
+    //name
+    disableRAWMode();
+    
+    char nome[20];
+
+    printf("\033[32mSeja bem vindo(a) ao nosso jogo!!!\033[0m\n");
+    printf("\033[36mPor favor, digite o seu nome: \033[0m\n");
+    scanf("%s", nome);
+    //run
+    enableRAWMode();
+
+    pthread_create(&id_gameRun, NULL, gameRun, &game);
+    pthread_join(id_gameRun, NULL);
+
+    disableRAWMode();
+    //end
+    printf("Game Over\n%s: fez um total de %i pontos \n", nome, game.clock);
     return 1;
 }
 
-int printBord()
+void* gameRun(void* game_info)
 {
-    printf("\033[33m");
-    for (size_t i = 0; i < SCREEM_SIZE; i++)
+    GAME_INFO * game = (GAME_INFO *) (game_info);
+    int lastclock = 0;
+    wayGenerator(game->way);
+
+    game->runing = 1;
+    while (game->runing)
     {
-            printf("%c", ((char)CHAR_BORD));
+        if (game->clock != lastclock)
+        {
+            clearScream();
+            lastclock = game->clock;
+
+            //o que vai acontecer
+            gameFeatures(game);
+        }else
+        {
+            usleep(SLEEP_TIME);
+            game->clock += 1;
+        }
     }
-    printf("\n\033[0m");
-}
-
-int gameFeatures(int* clock, int* on, char way [SCREEM_SIZE][SCREEM_HEIGHT], AVIAO* aviao)
-{
-    //server
-    wayUpdater(way);
-    *on = isColliding(way, aviao);
-    //client
-    printBord();
-    wayPrinter(way, aviao);
-    printBord();
 };
-
 int wayGenerator(char way [SCREEM_SIZE][SCREEM_HEIGHT])
 {
     //wall
@@ -122,9 +129,8 @@ int wayGenerator(char way [SCREEM_SIZE][SCREEM_HEIGHT])
     {
         wayUpdater(way);
     }
-    
-}
-
+    return 1;
+};
 int wayUpdater(char way [SCREEM_SIZE][SCREEM_HEIGHT])
 {
     //walk way
@@ -146,8 +152,8 @@ int wayUpdater(char way [SCREEM_SIZE][SCREEM_HEIGHT])
     {
         way[(SCREEM_SIZE-1)][i] = new_way[i];
     }
+    return 1;
 };
-
 int createNewCol(char way [SCREEM_SIZE][SCREEM_HEIGHT], char new_way [SCREEM_HEIGHT])
 {
     int pass_col = 0;
@@ -184,17 +190,52 @@ int createNewCol(char way [SCREEM_SIZE][SCREEM_HEIGHT], char new_way [SCREEM_HEI
             }
         }
     }
-
+    return 1;
+};
+int clearScream()
+{
+    system(CLEAR);
+    return 1;
 }
-
-int wayPrinter(char way [SCREEM_SIZE][SCREEM_HEIGHT], AVIAO* aviao)
+int gameFeatures(GAME_INFO* game)
+{
+    //server
+    wayUpdater(game->way);
+    game->runing = isColliding(game->way, game->pos_x, game->pos_y);
+    //client
+    printBord();
+    wayPrinter(game->way, game->pos_x, game->pos_y);
+    printBord();
+    return 1;
+};
+int isColliding(char way [SCREEM_SIZE][SCREEM_HEIGHT], int x, int y)
+{
+    if (((char) way[x][y]) == ((char) CHAR_BLOCK))
+    {
+        return 0;
+    }else
+    {
+        return 1;
+    }    
+};
+int printBord()
+{
+    printf("\033[33m");
+    for (size_t i = 0; i < SCREEM_SIZE; i++)
+    {
+            printf("%c", ((char)CHAR_BORD));
+    }
+    printf("\n\033[0m");
+    return 1;
+};
+int wayPrinter(char way [SCREEM_SIZE][SCREEM_HEIGHT], int x, int y)
 {
     for (size_t i = 0; i < SCREEM_HEIGHT; i++)
     {
         for (size_t j = 0; j < SCREEM_SIZE; j++)
         {
             //print plane
-            if (i == aviao->y && j == aviao->x)
+            if (i == y && j == x)
             {
 
                     printf("\033[31m");
@@ -207,31 +248,27 @@ int wayPrinter(char way [SCREEM_SIZE][SCREEM_HEIGHT], AVIAO* aviao)
         }
         printf("\n");
     }
-}
-
-int isColliding(char way [SCREEM_SIZE][SCREEM_HEIGHT], AVIAO* aviao)
-{
-    if (((char) way[aviao->x][aviao->y]) == ((char) CHAR_BLOCK))
-    {
-        return 0;
-    }else
-    {
-        return 1;
-    }    
-}
-
-int main()
-{
-    int clock;
-
-    char nome[20];
-
-    printf("\033[32mSeja bem vindo(a) ao nosso jogo!!!\033[0m\n");
-    printf("\033[36mPor favor, digite o seu nome: \033[0m\n");
-    scanf("%s", nome);
-
-    gameRum(&clock);
-
-    printf("Game Over\n %s: fez um total de %i pontos \n", nome, clock);
     return 1;
-}
+};
+
+
+#ifdef __linux__
+    /// This function enables RAW mode for terminal.
+    void enableRAWMode() 
+    {
+        struct termios raw;
+        tcgetattr(STDIN_FILENO, &raw);
+        tcgetattr(STDIN_FILENO, &original);
+        atexit(&disableRAWMode);
+        raw.c_lflag &= ~(ECHO | ICANON);
+
+        tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
+    }
+
+    void disableRAWMode() 
+    {
+        tcsetattr(STDIN_FILENO, TCSAFLUSH, &original);
+    }
+#elif _WIN32
+
+#endif
