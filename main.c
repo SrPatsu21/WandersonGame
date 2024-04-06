@@ -23,11 +23,6 @@
     #define SLEEP_TIME 500
     #define CHAR_BORD 205
     #define CHAR_BLOCK 219
-
-    void usleep(int time)
-    {
-        Sleep(time);
-    }
 #else
 
 #endif
@@ -40,6 +35,7 @@ typedef struct GameInfo
 
 //n mexer no que ta certo
 void* gameRun(void * game_info);
+void* keyGet(void* game_info);
 int clearScream();
 int printBord();
 //arrumar
@@ -62,7 +58,7 @@ int main()
     game.clock = 0;
     game.pos_x = 2;
     game.pos_y = ((int)SCREEM_HEIGHT/2);
-    game.runing = 0;    
+    game.runing = 1;    
 
     //thread
     pthread_t id_gameRun, id_keyGet;
@@ -75,17 +71,18 @@ int main()
     printf("\033[32mSeja bem vindo(a) ao nosso jogo!!!\033[0m\n");
     printf("\033[36mPor favor, digite o seu nome: \033[0m\n");
     scanf("%s", nome);
-    //run
-    enableRAWMode();
 
+    //run
     pthread_create(&id_gameRun, NULL, gameRun, &game);
+    pthread_create(&id_keyGet, NULL, keyGet, &game);
     pthread_join(id_gameRun, NULL);
+    pthread_join(id_keyGet, NULL);
 
     disableRAWMode();
     //end
     printf("Game Over\n%s: fez um total de %i pontos \n", nome, game.clock);
     return 1;
-}
+};
 
 void* gameRun(void* game_info)
 {
@@ -93,7 +90,6 @@ void* gameRun(void* game_info)
     int lastclock = 0;
     wayGenerator(game->way);
 
-    game->runing = 1;
     while (game->runing)
     {
         if (game->clock != lastclock)
@@ -103,6 +99,7 @@ void* gameRun(void* game_info)
 
             //o que vai acontecer
             gameFeatures(game);
+            game->runing = isColliding(game->way, game->pos_x, game->pos_y);
         }else
         {
             usleep(SLEEP_TIME);
@@ -201,7 +198,6 @@ int gameFeatures(GAME_INFO* game)
 {
     //server
     wayUpdater(game->way);
-    game->runing = isColliding(game->way, game->pos_x, game->pos_y);
     //client
     printBord();
     wayPrinter(game->way, game->pos_x, game->pos_y);
@@ -210,7 +206,7 @@ int gameFeatures(GAME_INFO* game)
 };
 int isColliding(char way [SCREEM_SIZE][SCREEM_HEIGHT], int x, int y)
 {
-    if (((char) way[x][y]) == ((char) CHAR_BLOCK))
+    if (((char) way[x][y]) == ((char) CHAR_BLOCK) || ((char) way[x][y]) == ((char) CHAR_WALL) )
     {
         return 0;
     }else
@@ -251,6 +247,51 @@ int wayPrinter(char way [SCREEM_SIZE][SCREEM_HEIGHT], int x, int y)
     return 1;
 };
 
+void* keyGet(void* game_info)
+{
+    GAME_INFO * game = (GAME_INFO *) (game_info);
+    enableRAWMode();
+    char ch = '\0';
+    while (game->runing)
+    {
+        ch = getchar();
+        if (ch != '\0')
+        {
+            if ('w' == ch || 'W' == ch)
+            {
+                if (0 < game->pos_y)
+                {
+                    game->pos_y--;
+                }
+            }else if ('s' == ch || 'S' == ch)
+            {
+                if (SCREEM_HEIGHT-1 > game->pos_y)
+                {
+                    game->pos_y++;
+                }
+            }else if('a' == ch || 'A' == ch)
+            {
+                if (0 < game->pos_x)
+                {
+                    game->pos_x--;
+                }
+            }else if('d' == ch || 'D' == ch)
+            {
+                if (SCREEM_SIZE > game->pos_x)
+                {
+                    game->pos_x++;
+                }
+            }
+            ch = '\0';
+            //update all
+            game->runing = isColliding(game->way, game->pos_x, game->pos_y);
+            clearScream();
+            printBord();
+            wayPrinter(game->way, game->pos_x, game->pos_y);
+            printBord();
+        }
+    }
+};
 
 #ifdef __linux__
     /// This function enables RAW mode for terminal.
@@ -270,5 +311,24 @@ int wayPrinter(char way [SCREEM_SIZE][SCREEM_HEIGHT], int x, int y)
         tcsetattr(STDIN_FILENO, TCSAFLUSH, &original);
     }
 #elif _WIN32
+    void usleep(int time)
+    {
+        Sleep(time);
+    }
 
+    void enableRAWMode() 
+    {
+        struct termios raw;
+        tcgetattr(STDIN_FILENO, &raw);
+        tcgetattr(STDIN_FILENO, &original);
+        atexit(&disableRAWMode);
+        raw.c_lflag &= ~(ECHO | ICANON);
+
+        tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
+    }
+
+    void disableRAWMode() 
+    {
+        tcsetattr(STDIN_FILENO, TCSAFLUSH, &original);
+    }
 #endif
