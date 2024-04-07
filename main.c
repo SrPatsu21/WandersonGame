@@ -1,4 +1,3 @@
-
 #include <stdio.h> 
 #include <stdlib.h> 
 #include <pthread.h> // Multithreading
@@ -17,13 +16,23 @@
     #define CHAR_BLOCK '#'
     struct termios original; // A struct to save the original state of terminal
 
+    int getKeyChar(void)
+    {
+        return getchar();
+    }
+
 #elif _WIN32
     #include <windows.h>
+    #include <conio.h>
     #define CLEAR "cls"
     #define SLEEP_TIME 500
     #define CHAR_BORD 205
     #define CHAR_BLOCK 219    
 
+    int getKeyChar(void)
+    {
+        return getch();
+    }
     void usleep(int time)
     {
         Sleep(time);
@@ -259,7 +268,7 @@ void* keyGet(void* game_info)
     char ch = '\0';
     while (game->runing)
     {
-        ch = getchar();
+        ch = getKeyChar();
         if (ch != '\0')
         {
             if ('w' == ch || 'W' == ch)
@@ -287,13 +296,13 @@ void* keyGet(void* game_info)
                     game->pos_x++;
                 }
             }
-            ch = '\0';
             //update all
             game->runing = isColliding(game->way, game->pos_x, game->pos_y, game->runing);
             clearScream();
             printBord();
             wayPrinter(game->way, game->pos_x, game->pos_y);
             printBord();
+            ch = '\0';
         }
     }
 };
