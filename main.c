@@ -18,11 +18,16 @@
     struct termios original; // A struct to save the original state of terminal
 
 #elif _WIN32
-    #include<windows.h>
+    #include <windows.h>
     #define CLEAR "cls"
     #define SLEEP_TIME 500
     #define CHAR_BORD 205
-    #define CHAR_BLOCK 219
+    #define CHAR_BLOCK 219    
+
+    void usleep(int time)
+    {
+        Sleep(time);
+    };
 #else
 
 #endif
@@ -44,7 +49,7 @@ int wayGenerator(char way [SCREEM_SIZE][SCREEM_HEIGHT]);
 int wayUpdater(char way [SCREEM_SIZE][SCREEM_HEIGHT]);
 int wayPrinter(char way [SCREEM_SIZE][SCREEM_HEIGHT], int x, int y);
 int createNewCol(char way [SCREEM_SIZE][SCREEM_HEIGHT], char new_way [SCREEM_HEIGHT]);
-int isColliding(char way [SCREEM_SIZE][SCREEM_HEIGHT], int x, int y);
+int isColliding(char way [SCREEM_SIZE][SCREEM_HEIGHT], int x, int y, int is);
 void enableRAWMode();
 void disableRAWMode();
 //code
@@ -99,7 +104,7 @@ void* gameRun(void* game_info)
 
             //o que vai acontecer
             gameFeatures(game);
-            game->runing = isColliding(game->way, game->pos_x, game->pos_y);
+            game->runing = isColliding(game->way, game->pos_x, game->pos_y, game->runing);
         }else
         {
             usleep(SLEEP_TIME);
@@ -204,14 +209,14 @@ int gameFeatures(GAME_INFO* game)
     printBord();
     return 1;
 };
-int isColliding(char way [SCREEM_SIZE][SCREEM_HEIGHT], int x, int y)
+int isColliding(char way [SCREEM_SIZE][SCREEM_HEIGHT], int x, int y, int is)
 {
     if (((char) way[x][y]) == ((char) CHAR_BLOCK) || ((char) way[x][y]) == ((char) CHAR_WALL) )
     {
         return 0;
     }else
     {
-        return 1;
+        return is;
     }    
 };
 int printBord()
@@ -284,7 +289,7 @@ void* keyGet(void* game_info)
             }
             ch = '\0';
             //update all
-            game->runing = isColliding(game->way, game->pos_x, game->pos_y);
+            game->runing = isColliding(game->way, game->pos_x, game->pos_y, game->runing);
             clearScream();
             printBord();
             wayPrinter(game->way, game->pos_x, game->pos_y);
@@ -304,31 +309,20 @@ void* keyGet(void* game_info)
         raw.c_lflag &= ~(ECHO | ICANON);
 
         tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
-    }
+    };
 
     void disableRAWMode() 
     {
         tcsetattr(STDIN_FILENO, TCSAFLUSH, &original);
-    }
+    };
 #elif _WIN32
-    void usleep(int time)
-    {
-        Sleep(time);
-    }
-
+    /// This function enables RAW mode for terminal.
     void enableRAWMode() 
     {
-        struct termios raw;
-        tcgetattr(STDIN_FILENO, &raw);
-        tcgetattr(STDIN_FILENO, &original);
-        atexit(&disableRAWMode);
-        raw.c_lflag &= ~(ECHO | ICANON);
-
-        tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
-    }
+    };
 
     void disableRAWMode() 
     {
-        tcsetattr(STDIN_FILENO, TCSAFLUSH, &original);
-    }
+    };
+
 #endif

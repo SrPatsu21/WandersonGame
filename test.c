@@ -1,67 +1,151 @@
-#include <pthread.h> // Multithreading
+#include <windows.h>
 #include <stdio.h>
-#include <stdlib.h>  // for atexit()
-#include <termios.h> // For changing terminal mode
-#include <unistd.h>  // For changing terminal mode
 
-struct termios original; // A struct to save the original state of terminal
-int ESCPressed = 0;      // For thread communication
+HANDLE hStdin;
+DWORD fdwSaveOldMode;
 
-void disableRAWMode();
-void enableRAWMode();
-void *asciRead();
-void *print();
+VOID ErrorExit(LPCSTR);
+VOID KeyEventProc(KEY_EVENT_RECORD);
+VOID MouseEventProc(MOUSE_EVENT_RECORD);
+VOID ResizeEventProc(WINDOW_BUFFER_SIZE_RECORD);
 
-int main() {
-  // Start Multithreading
-  pthread_t id_print, id_read;
+int main(VOID)
+{
+    DWORD cNumRead, fdwMode, i;
+    INPUT_RECORD irInBuf[128];
+    int counter=0;
 
-  pthread_create(&id_print, NULL, print, NULL);
-  pthread_create(&id_read, NULL, asciRead, NULL);
+    // Get the standard input handle.
 
-  pthread_join(id_print, NULL);
-  pthread_join(id_read, NULL);
+    hStdin = GetStdHandle(STD_INPUT_HANDLE);
+    if (hStdin == INVALID_HANDLE_VALUE)
+        ErrorExit("GetStdHandle");
 
-  return 0;
+    // Save the current input mode, to be restored on exit.
+
+    if (! GetConsoleMode(hStdin, &fdwSaveOldMode) )
+        ErrorExit("GetConsoleMode");
+
+    // Enable the window and mouse input events.
+
+    fdwMode = ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT;
+    if (! SetConsoleMode(hStdin, fdwMode) )
+        ErrorExit("SetConsoleMode");
+
+    // Loop to read and handle the next 100 input events.
+
+    while (counter++ <= 100)
+    {
+        // Wait for the events.
+
+        if (! ReadConsoleInput(
+                hStdin,      // input buffer handle
+                irInBuf,     // buffer to read into
+                128,         // size of read buffer
+                &cNumRead) ) // number of records read
+            ErrorExit("ReadConsoleInput");
+
+        // Dispatch the events to the appropriate handler.
+
+        for (i = 0; i < cNumRead; i++)
+        {
+            switch(irInBuf[i].EventType)
+            {
+                case KEY_EVENT: // keyboard input
+                    KeyEventProc(irInBuf[i].Event.KeyEvent);
+                    break;
+
+                case MOUSE_EVENT: // mouse input
+                    MouseEventProc(irInBuf[i].Event.MouseEvent);
+                    break;
+
+                case WINDOW_BUFFER_SIZE_EVENT: // scrn buf. resizing
+                    ResizeEventProc( irInBuf[i].Event.WindowBufferSizeEvent );
+                    break;
+
+                case FOCUS_EVENT:  // disregard focus events
+
+                case MENU_EVENT:   // disregard menu events
+                    break;
+
+                default:
+                    ErrorExit("Unknown event type");
+                    break;
+            }
+        }
+    }
+
+    // Restore input mode on exit.
+
+    SetConsoleMode(hStdin, fdwSaveOldMode);
+
+    return 0;
 }
 
-/// Reads keyboard input
-void *asciRead() {
-  enableRAWMode(); // local function: Enable Raw Mode
-  char ch;
-  while ((ch = getchar()) != 27)
-    ; // ASCI code for ESC is 27
-  ESCPressed = 1;
-  printf("ESC Pressed!\n");
+VOID ErrorExit (LPSTR lpszMessage)
+{
+    fprintf(stderr, "%s\n", lpszMessage);
+
+    // Restore input mode on exit.
+
+    SetConsoleMode(hStdin, fdwSaveOldMode);
+
+    ExitProcess(0);
 }
 
-/// Doing Stuff while listening to keyboard
-void *print() {
-  while (!ESCPressed) { // When ESC is not pressed
-    sleep(1);
-    printf("I am Printing!\n");
-  }
-  printf("Printing Thread Finished!\n");
+VOID KeyEventProc(KEY_EVENT_RECORD ker)
+{
+    printf("Key event: ");
+
+    if(ker.bKeyDown)
+        printf("key pressed\n");
+    else printf("key released\n");
 }
 
-/// This function enables RAW mode for terminal.
-void enableRAWMode() {
-  struct termios raw;
-  tcgetattr(STDIN_FILENO, &raw); // Save the state of the terminal to struct raw
-                                 // STDIN_FILENO is from <stdlib.h>
-                                 // tcgetattr() from <termios.h>
-  tcgetattr(STDIN_FILENO, &original);
-  atexit(&disableRAWMode); // Revert to canonical mode when exiting the program
-                           // atext() from <stdlib.h>
-  raw.c_lflag &=~(ECHO | ICANON); // Turn off canonical mode
-                        // Turn off ECHO mode so that keyboard is not
-                        // printing to terminal
-                        // ICANON and ECHO is bitflag. ~ is binary NOT operator
+VOID MouseEventProc(MOUSE_EVENT_RECORD mer)
+{
+#ifndef MOUSE_HWHEELED
+#define MOUSE_HWHEELED 0x0008
+#endif
+    printf("Mouse event: ");
 
-  tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw); // Set the terminal to be in raw mode
-                   // tcsetattr() from <termios.h>
+    switch(mer.dwEventFlags)
+    {
+        case 0:
+
+            if(mer.dwButtonState == FROM_LEFT_1ST_BUTTON_PRESSED)
+            {
+                printf("left button press \n");
+            }
+            else if(mer.dwButtonState == RIGHTMOST_BUTTON_PRESSED)
+            {
+                printf("right button press \n");
+            }
+            else
+            {
+                printf("button press\n");
+            }
+            break;
+        case DOUBLE_CLICK:
+            printf("double click\n");
+            break;
+        case MOUSE_HWHEELED:
+            printf("horizontal mouse wheel\n");
+            break;
+        case MOUSE_MOVED:
+            printf("mouse moved\n");
+            break;
+        case MOUSE_WHEELED:
+            printf("vertical mouse wheel\n");
+            break;
+        default:
+            printf("unknown\n");
+            break;
+    }
 }
 
-void disableRAWMode() {
-  tcsetattr(STDIN_FILENO, TCSAFLUSH, &original); // Set terminal to original state
+VOID ResizeEventProc(WINDOW_BUFFER_SIZE_RECORD wbsr)
+{
+    printf("Resize event\n");
+    printf("Console screen buffer is %d columns by %d rows.\n", wbsr.dwSize.X, wbsr.dwSize.Y);
 }
