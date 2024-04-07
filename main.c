@@ -1,5 +1,6 @@
 #include <stdio.h> 
 #include <stdlib.h> 
+#include <time.h>//rand
 #include <pthread.h> // Multithreading
 #define SCREEM_SIZE 128
 #define SCREEM_HEIGHT 8
@@ -66,6 +67,7 @@ void disableRAWMode();
 int main()
 {
     enableRAWMode();
+    srand(time(NULL));
     //game
     GAME_INFO game;
 
@@ -291,7 +293,7 @@ void* keyGet(void* game_info)
                 }
             }else if('d' == ch || 'D' == ch)
             {
-                if (SCREEM_SIZE > game->pos_x)
+                if (SCREEM_SIZE-1 > game->pos_x)
                 {
                     game->pos_x++;
                 }
