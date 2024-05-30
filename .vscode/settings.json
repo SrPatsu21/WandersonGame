@@ -4,6 +4,7 @@
         "windows.h": "c",
         "unistd.h": "c",
         "stdio.h": "c",
-        "termios.h": "c"
+        "termios.h": "c",
+        "iostream": "cpp"
     }
 }
