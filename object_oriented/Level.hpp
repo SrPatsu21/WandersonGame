@@ -17,8 +17,9 @@ protected:
 public:
     Level(Block* empit, Block* Blocked, Plane* Plane);
     ~Level();
-
+    //TODO create new full blocks on back line
     void generateNewObstaclesLine();
+    //TODO make all the full blocks walk back
     void swapObstaclesToFrontLines();
     //TODO join generateNewObstaclesLine() and swapObstaclesToFrontLines()
     void updatePath();
