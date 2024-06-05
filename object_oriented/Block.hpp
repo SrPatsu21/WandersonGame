@@ -6,7 +6,7 @@
 class Block
 {
 private:
-    char *block;
+    char* block;
 public:
     static const int SIZE_X = 4;
     static const int SIZE_Y = 3;

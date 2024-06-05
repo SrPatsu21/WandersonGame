@@ -5,6 +5,7 @@
 #include "Plane.hpp"
 #include <iostream>
 #include <list>
+#include "Base.hpp"
 
 class Level
 {
@@ -127,6 +128,35 @@ void Level::generateNewObstaclesLine()
     for (size_t i = 0; i < LEVEL_HEIGTH; i++)
     {
         this->level[i][(LEVEL_WIDTH+1)] = blocked;
+    }
+};
+
+void Level::returnScreen()
+{
+    //*print bord
+    //TODO function to print the bord
+    for (size_t i = 0; i < LEVEL_WIDTH; i++)
+    {
+        std::cout <<CHAR_BORD;
+    }
+    //*print the path
+    for (size_t i = 0; i < LEVEL_HEIGTH; i++)
+    {
+        for (size_t j = 0; j < Block::SIZE_Y; j++)
+        {
+            std::cout <<CHAR_WALL;
+            for (size_t k = 0; k < LEVEL_WIDTH; k++)
+            {
+                this->level[i][k]->printLine(j);
+            }
+        }
+        
+    }
+    //*print bord
+    //TODO function to print the bord
+    for (size_t i = 0; i < LEVEL_WIDTH; i++)
+    {
+        std::cout <<CHAR_BORD;
     }
 };
 

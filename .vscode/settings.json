@@ -8,6 +8,8 @@
         "stdio.h": "c",
         "termios.h": "c",
         "iostream": "cpp",
-        "list": "cpp"
+        "list": "cpp",
+        "limits": "cpp",
+        "type_traits": "cpp"
     }
 }
