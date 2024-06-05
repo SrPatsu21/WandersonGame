@@ -1,10 +1,13 @@
 {
+    "editor.fontFamily": "'Fira Code'",
+    "editor.fontLigatures": true,
     "files.associations": {
         "pthread.h": "c",
         "windows.h": "c",
         "unistd.h": "c",
         "stdio.h": "c",
         "termios.h": "c",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "list": "cpp"
     }
 }

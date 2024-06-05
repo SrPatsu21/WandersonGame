@@ -4,8 +4,10 @@ Plane::Plane(int x = 0, int y = 0)
 {
     this->x = x;
     this->y = y;
-    this->plane = new Block("|\\    \\\n  ====|===>\n|/    /"); //representação do avião no jogo
-    this->plane_fall = new Block("|\\    \\\n  ====|===>\n|/    /"); // quando ele estiver caindo
+    //*plane on game
+    this->plane = new Block("|\\    \\\n  ====|===>\n|/    /");
+    //*plane destroid (before lose)
+    this->plane_fall = new Block("|\\    \\\n  ====|===>\n|/    /");
 };
 Plane::Plane(int x = 0, int y = 0, Block* plane, Block* plane_fall)
 {
