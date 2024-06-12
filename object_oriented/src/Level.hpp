@@ -15,10 +15,11 @@ private:
     Plane* plane;
     //*the last line is the line that will be generated
     //![y] [x]
-    Block*** level;
+    Block** level;
 protected:
     const int LEVEL_WIDTH = 32;
     const int LEVEL_HEIGTH = 8;
+    const int LEVEL_WH = LEVEL_WIDTH * LEVEL_HEIGTH;
     bool runnig;
 
     //TODO random generation
@@ -53,19 +54,16 @@ Level::Level(Plane* plane, Block* empit, Block* blocked)
     this->plane->setPos(2, (LEVEL_HEIGTH/2));
 
     //*alloc the Level
-    this->level = (Block***) std::malloc(LEVEL_HEIGTH*sizeof(Block**));
+    this->level = (Block**) std::malloc(LEVEL_WH*sizeof(Block*));    
+    std::cout << "foi \n";
+    //*set lvl empit
     for (size_t i = 0; i < LEVEL_HEIGTH; i++)
     {
-        this->level[i] = (Block**) std::malloc((LEVEL_WIDTH+1)*sizeof(Block*));
+        for (size_t j = 0; j < (LEVEL_WIDTH); j++)
+        {
+            this->level[0] = empit;
+        }
     }
-    //*set lvl empit
-    // for (size_t i = 0; i < LEVEL_HEIGTH; i++)
-    // {
-    //     for (size_t j = 0; j < (LEVEL_WIDTH+1); j++)
-    //     {
-    //         this->level[i][j] = empit;
-    //     }
-    // }
     // updatePath();
 };
 

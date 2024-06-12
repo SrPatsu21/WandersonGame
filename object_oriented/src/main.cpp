@@ -14,7 +14,7 @@ int main()
     // plane->getPlane()->printLine(2);
 
     Level* level = new Level(new Plane(0, 0), CHAR_FREE, CHAR_BLOCK);
-    level->returnScreen();
+    // level->returnScreen();
 
     // delete level;
     std::cout << std::endl;
