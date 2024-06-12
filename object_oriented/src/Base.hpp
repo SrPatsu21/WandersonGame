@@ -14,22 +14,22 @@
     #define CHAR_BLOCK '#'
 
 #elif _WIN32
-    #include <windows.h>
-    #include <conio.h>
+    // #include <windows.h>
+    // #include <conio.h>
     #define CLEAR "cls"
     #define SLEEP_TIME 500
     #define KEY_SLEEP_TIME 100
     #define CHAR_BORD 205
     #define CHAR_BLOCK 219    
 
-    int getKeyChar()
-    {
-        return getch();
-    }
-    void usleep(int time)
-    {
-        Sleep(time);
-    };
+    // int getKeyChar()
+    // {
+    //     return getch();
+    // }
+    // void usleep(int time)
+    // {
+    //     Sleep(time);
+    // };
 #else
 
 #endif

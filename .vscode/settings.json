@@ -10,6 +10,9 @@
         "iostream": "cpp",
         "list": "cpp",
         "limits": "cpp",
-        "type_traits": "cpp"
+        "type_traits": "cpp",
+        "new": "cpp",
+        "algorithm": "cpp",
+        "format": "cpp"
     }
 }

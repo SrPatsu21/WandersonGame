@@ -1,15 +1,18 @@
 #include "./Plane.hpp"
 
-Plane::Plane(int x = 0, int y = 0)
+Plane::Plane(int x, int y)
 {
     this->x = x;
     this->y = y;
+    //* models
+    char array_plane[(Block::SIZE_X*Block::SIZE_Y)+1] = "OOOOOOOOOOOO";
+    char array_plane_fall[(Block::SIZE_X*Block::SIZE_Y)+1] = "000000000000";
     //*plane on game
-    this->plane = new Block("|\\    \\\n  ====|===>\n|/    /");
+    this->plane = new Block(array_plane);
     //*plane destroid (before lose)
-    this->plane_fall = new Block("|\\    \\\n  ====|===>\n|/    /");
+    this->plane_fall = new Block(array_plane_fall);
 };
-Plane::Plane(int x = 0, int y = 0, Block* plane, Block* plane_fall)
+Plane::Plane(int x, int y, Block* plane, Block* plane_fall)
 {
     this->x = x;
     this->y = y;
