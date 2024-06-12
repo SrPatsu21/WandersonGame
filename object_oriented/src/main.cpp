@@ -7,7 +7,8 @@
 int main()
 {
     Level* level = new Level(new Plane(0, 0), CHAR_FREE, CHAR_BLOCK);
-    level->printBord();
+    // level->printBord();
 
+    delete level;
     return 0;
 }

@@ -27,8 +27,8 @@ protected:
     //*make all the full blocks walk back
     void swapObstaclesToFrontLines();
 public:
-    Level(Plane* plane, Block* empit, Block* Blocked);
-    Level(Plane* plane, char empit, char Blocked);
+    Level(Plane* plane, Block* empit, Block* blocked);
+    Level(Plane* plane, char empit, char blocked);
     ~Level();
 
     //* print screen
@@ -43,7 +43,7 @@ public:
 
 };
 
-Level::Level(Plane* plane, Block* empit, Block* Blocked)
+Level::Level(Plane* plane, Block* empit, Block* blocked)
 {
     //*set lvl parameters
     this->empit = empit;
@@ -66,9 +66,10 @@ Level::Level(Plane* plane, Block* empit, Block* Blocked)
             this->level[i][j] = empit;
         }
     }
-    updatePath();
+    // updatePath();
 };
-Level::Level(Plane* plane, char empit, char Blocked)
+
+Level::Level(Plane* plane, char empit, char blocked)
 {
     char array_empit[(Block::SIZE_X*Block::SIZE_Y)];
     char array_blocked[(Block::SIZE_X*Block::SIZE_Y)];
@@ -168,18 +169,18 @@ void Level::returnScreen()
 {
     printBord();
     //*print the path
-    // for (size_t i = 0; i < LEVEL_HEIGTH; i++)
-    // {
-    //     for (size_t j = 0; j < Block::SIZE_Y; j++)
-    //     {
-    //         std::cout <<CHAR_WALL;
-    //         for (size_t k = 0; k < LEVEL_WIDTH; k++)
-    //         {
-    //             this->level[i][k]->printLine(j);
-    //         }
-    //     }
+    for (size_t i = 0; i < LEVEL_HEIGTH; i++)
+    {
+        for (size_t j = 0; j < Block::SIZE_Y; j++)
+        {
+            std::cout <<CHAR_WALL;
+            for (size_t k = 0; k < LEVEL_WIDTH; k++)
+            {
+                this->level[i][k]->printLine(j);
+            }
+        }
         
-    // }
+    }
     printBord();
 
 };
