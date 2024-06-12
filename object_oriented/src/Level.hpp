@@ -53,19 +53,19 @@ Level::Level(Plane* plane, Block* empit, Block* blocked)
     this->plane->setPos(2, (LEVEL_HEIGTH/2));
 
     //*alloc the Level
-    this->level = (Block***) std::malloc(LEVEL_HEIGTH*sizeof(Block*));
+    this->level = (Block***) std::malloc(LEVEL_HEIGTH*sizeof(Block**));
     for (size_t i = 0; i < LEVEL_HEIGTH; i++)
     {
         this->level[i] = (Block**) std::malloc((LEVEL_WIDTH+1)*sizeof(Block*));
     }
     //*set lvl empit
-    for (size_t i = 0; i < LEVEL_HEIGTH; i++)
-    {
-        for (size_t j = 0; j < (LEVEL_WIDTH+1); j++)
-        {
-            this->level[i][j] = empit;
-        }
-    }
+    // for (size_t i = 0; i < LEVEL_HEIGTH; i++)
+    // {
+    //     for (size_t j = 0; j < (LEVEL_WIDTH+1); j++)
+    //     {
+    //         this->level[i][j] = empit;
+    //     }
+    // }
     // updatePath();
 };
 
@@ -159,10 +159,12 @@ void Level::generateNewObstaclesLine()
 
 void Level::printBord()
 {
-    for (size_t i = 0; i < LEVEL_WIDTH; i++)
+    char c = CHAR_BORD;
+    for (size_t i = 0; i < (LEVEL_WIDTH*Block::SIZE_X); i++)
     {
-        std::cout << 'a';
+        std::cout << c;
     }
+    std::cout << std::endl;
 }
 
 void Level::returnScreen()
@@ -173,7 +175,7 @@ void Level::returnScreen()
     {
         for (size_t j = 0; j < Block::SIZE_Y; j++)
         {
-            std::cout <<CHAR_WALL;
+            std::cout << CHAR_WALL;
             for (size_t k = 0; k < LEVEL_WIDTH; k++)
             {
                 this->level[i][k]->printLine(j);
