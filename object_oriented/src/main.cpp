@@ -22,6 +22,9 @@ int main()
     }
     
     Level* level = new Level(new Plane(0, 0), new Block(array_empit), new Block(array_blocked));
+    level->updatePath();
+
+
     level->returnScreen();
     
     delete level;

@@ -80,7 +80,7 @@ Level::~Level()
 void Level::swapObstaclesToFrontLines()
 {
     //* if plane is no colliding
-    if (level[plane->getY()*LEVEL_WIDTH+plane->getY()] != blocked)
+    if (level[plane->getY()*LEVEL_WIDTH+plane->getX()] != blocked)
     {
         for (size_t i = 0; i < LEVEL_HEIGTH; i++)
         {
@@ -130,9 +130,13 @@ void Level::swapObstaclesToFrontLines()
 
 void Level::generateNewObstaclesLine()
 {
+
     for (size_t i = 0; i < LEVEL_HEIGTH; i++)
     {
-        this->level[(i*(LEVEL_WIDTH+1))] = blocked;
+        for (size_t j = LEVEL_WIDTH; j < (LEVEL_WIDTH+1); j++)
+        {
+            level[(i*(LEVEL_WIDTH)+j)] = blocked;
+        }
     }
 };
 
@@ -157,7 +161,7 @@ void Level::returnScreen()
             std::cout << ((char)CHAR_WALL);
             for (size_t k = 0; k < LEVEL_WIDTH; k++)
             {
-                level[(i*(LEVEL_WIDTH+1))]->printLine(j);
+                level[(i*(LEVEL_WIDTH)+k)]->printLine(j);
             }
             std::cout << std::endl;    
         }    
