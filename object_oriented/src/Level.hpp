@@ -18,7 +18,7 @@ private:
     //![y] [x]
     Block** level;
 protected:
-    const int LEVEL_WIDTH = 32 + 1;
+    const int LEVEL_WIDTH = 28 + 1;
     const int LEVEL_HEIGTH = 8;
     const int LEVEL_WH = LEVEL_WIDTH * LEVEL_HEIGTH;
     bool runnig;
@@ -205,7 +205,9 @@ void Level::returnScreen()
 
 void Level::updatePath()
 {
+    
     generateNewObstaclesLine();
     swapObstaclesToFrontLines();
 };
+
 #endif 

@@ -8,7 +8,7 @@ class Block
 private:
     char* block;
 public:
-    static const int SIZE_X = 4;
+    static const int SIZE_X = 5;
     static const int SIZE_Y = 3;
     Block(char* block);
     ~Block();
