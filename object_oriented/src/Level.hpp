@@ -5,6 +5,7 @@
 #include "Plane.hpp"
 #include <iostream>
 #include <list>
+#include <time.h>
 #include "Base.hpp"
 
 class Level
@@ -62,7 +63,10 @@ Level::Level(Plane* plane, Block* empit, Block* blocked)
             this->level[(i*LEVEL_WIDTH+j)] = empit;
         }
     }
-    // updatePath();
+    //* random seed
+    srand(time(NULL));
+    //* creat path
+    updatePath();
 };
 
 Level::~Level()
@@ -130,11 +134,44 @@ void Level::swapObstaclesToFrontLines()
 
 void Level::generateNewObstaclesLine()
 {
-
+    int pass_col = 0;
     for (size_t i = 0; i < LEVEL_HEIGTH; i++)
     {
-        level[(i*(LEVEL_WIDTH)+LEVEL_WIDTH)] = blocked;
+
+        int r =(rand() % 4);
+        if (r != 0)
+        {
+            pass_col++;
+            level[(i*(LEVEL_WIDTH)+LEVEL_WIDTH)] = empit;
+        }else
+        {
+            level[(i*(LEVEL_WIDTH)+LEVEL_WIDTH)] = blocked;
+        }
     }
+
+    if (pass_col == 0)
+    {
+        level[((rand() % LEVEL_HEIGTH)*(LEVEL_WIDTH)+LEVEL_WIDTH)] = empit;
+    }
+    
+    for (size_t i = 1; i < LEVEL_HEIGTH-1; i++)
+    {   
+        if(level[((i+1)*(LEVEL_WIDTH)+LEVEL_WIDTH)] != empit && level[((i-1)*(LEVEL_WIDTH)+LEVEL_WIDTH)] != empit && level[(i*(LEVEL_WIDTH)+LEVEL_WIDTH)] != empit)
+        {
+            if (rand() % 2 == 0)
+            {
+                level[((i+1)*(LEVEL_WIDTH)+LEVEL_WIDTH)] = empit;
+            }
+            else
+            {
+                level[((i-1)*(LEVEL_WIDTH)+LEVEL_WIDTH)] = empit;
+            }
+        }else if(level[(i*(LEVEL_WIDTH-1)+LEVEL_WIDTH)] != empit)
+        {
+             level[(i*(LEVEL_WIDTH)+LEVEL_WIDTH)] = empit;
+        }
+    }
+    
 };
 
 void Level::printBord()
@@ -164,7 +201,6 @@ void Level::returnScreen()
         }    
     }
     printBord();
-
 };
 
 void Level::updatePath()
