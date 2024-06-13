@@ -133,10 +133,7 @@ void Level::generateNewObstaclesLine()
 
     for (size_t i = 0; i < LEVEL_HEIGTH; i++)
     {
-        for (size_t j = LEVEL_WIDTH; j < (LEVEL_WIDTH+1); j++)
-        {
-            level[(i*(LEVEL_WIDTH)+j)] = blocked;
-        }
+        level[(i*(LEVEL_WIDTH)+LEVEL_WIDTH)] = blocked;
     }
 };
 
