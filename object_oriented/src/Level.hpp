@@ -17,7 +17,7 @@ private:
     //![y] [x]
     Block** level;
 protected:
-    const int LEVEL_WIDTH = 32;
+    const int LEVEL_WIDTH = 32 + 1;
     const int LEVEL_HEIGTH = 8;
     const int LEVEL_WH = LEVEL_WIDTH * LEVEL_HEIGTH;
     bool runnig;
@@ -29,7 +29,6 @@ protected:
     void swapObstaclesToFrontLines();
 public:
     Level(Plane* plane, Block* empit, Block* blocked);
-    Level(Plane* plane, char empit, char blocked);
     ~Level();
 
     //* print screen
@@ -55,29 +54,15 @@ Level::Level(Plane* plane, Block* empit, Block* blocked)
 
     //*alloc the Level
     this->level = (Block**) std::malloc(LEVEL_WH*sizeof(Block*));    
-    std::cout << "foi \n";
     //*set lvl empit
     for (size_t i = 0; i < LEVEL_HEIGTH; i++)
     {
-        for (size_t j = 0; j < (LEVEL_WIDTH); j++)
+        for (size_t j = 0; j < LEVEL_WIDTH; j++)
         {
-            this->level[0] = empit;
+            this->level[(i*LEVEL_WIDTH+j)] = empit;
         }
     }
     // updatePath();
-};
-
-Level::Level(Plane* plane, char empit, char blocked)
-{
-    char array_empit[(Block::SIZE_X*Block::SIZE_Y)];
-    char array_blocked[(Block::SIZE_X*Block::SIZE_Y)];
-    for (size_t i = 0; i < (Block::SIZE_X*Block::SIZE_Y); i++)
-    {
-        array_empit[i] = CHAR_FREE;
-        array_blocked[i] = CHAR_BLOCK;
-    }
-    
-    Level(plane, new Block(array_empit), new Block(array_blocked));
 };
 
 Level::~Level()
@@ -86,12 +71,8 @@ Level::~Level()
     {
         for (size_t j = 0; j < (LEVEL_WIDTH+1); j++)
         {
-            delete this->level[i][j];
+            delete this->level[(i*LEVEL_WIDTH+j)];
         }
-    }
-    for (size_t i = 0; i < LEVEL_HEIGTH; i++)
-    {
-        delete this->level[i];
     }
     delete this->level;
 };
@@ -99,22 +80,22 @@ Level::~Level()
 void Level::swapObstaclesToFrontLines()
 {
     //* if plane is no colliding
-    if (this->level[this->plane->getY()][this->plane->getX()+1] != blocked)
+    if (level[plane->getY()*LEVEL_WIDTH+plane->getY()] != blocked)
     {
         for (size_t i = 0; i < LEVEL_HEIGTH; i++)
         {
             for (size_t j = 0; j < LEVEL_WIDTH; j++)
             {
                 //*plane cant be moved back
-                if (plane->getPlane() != this->level[i][j])
+                if (plane->getPlane() != this->level[(i*LEVEL_WIDTH+j)])
                 {
                     //*plane cant be duplicated
-                    if (plane->getPlane() != this->level[i][(j+1)])
+                    if (plane->getPlane() != level[(i*LEVEL_WIDTH+(j+1))])
                     {
-                        this->level[i][j] = this->level[i][(j+1)];
+                        level[(i*LEVEL_WIDTH+j)] = level[(i*LEVEL_WIDTH+(j+1))];
                     }else
                     {
-                        this->level[i][j] = empit;
+                        level[(i*LEVEL_WIDTH+j)] = empit;
                     }
                 }
             }
@@ -127,19 +108,19 @@ void Level::swapObstaclesToFrontLines()
             for (size_t j = 0; j < LEVEL_WIDTH; j++)
             {
                 //*plane cant be moved back
-                if (plane->getPlane() != this->level[i][j])
+                if (plane->getPlane() != level[(i*LEVEL_WIDTH+j)])
                 {
                     //*plane cant be duplicated
-                    if (plane->getPlane() != this->level[i][(j+1)])
+                    if (plane->getPlane() != level[(i*LEVEL_WIDTH+(j+1))])
                     {
-                        this->level[i][j] = this->level[i][(j+1)];
+                        level[(i*LEVEL_WIDTH+j)] = level[(i*LEVEL_WIDTH+(j+1))];
                     }else
                     {
-                        this->level[i][j] = empit;
+                        level[(i*LEVEL_WIDTH+j)] = empit;
                     }
                 }else
                 {
-                    this->level[i][j] = plane->getPlaneFall();
+                    level[(i*LEVEL_WIDTH+j)] = plane->getPlaneFall();
                 }
             }
         }
@@ -151,14 +132,14 @@ void Level::generateNewObstaclesLine()
 {
     for (size_t i = 0; i < LEVEL_HEIGTH; i++)
     {
-        this->level[i][(LEVEL_WIDTH+1)] = blocked;
+        this->level[(i*(LEVEL_WIDTH+1))] = blocked;
     }
 };
 
 void Level::printBord()
 {
-    char c = CHAR_BORD;
-    for (size_t i = 0; i < (LEVEL_WIDTH*Block::SIZE_X); i++)
+    char c = ((char)CHAR_BORD);
+    for (size_t i = 0; i < ((LEVEL_WIDTH*Block::SIZE_X)+1); i++)
     {
         std::cout << c;
     }
@@ -173,13 +154,13 @@ void Level::returnScreen()
     {
         for (size_t j = 0; j < Block::SIZE_Y; j++)
         {
-            std::cout << CHAR_WALL;
+            std::cout << ((char)CHAR_WALL);
             for (size_t k = 0; k < LEVEL_WIDTH; k++)
             {
-                this->level[i][k]->printLine(j);
+                level[(i*(LEVEL_WIDTH+1))]->printLine(j);
             }
-        }
-        
+            std::cout << std::endl;    
+        }    
     }
     printBord();
 
