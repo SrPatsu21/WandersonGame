@@ -5,3 +5,5 @@
 `./object_oriented/build/game.exe`
 - linux \
 `./object_oriented/build/game`
+## Screan
+- the terminal most hava more them 1200x450 px size or 146x26 char spaces

@@ -12,6 +12,8 @@ auto gameRun(Level* level)
 
 int main()
 {
+    //* clear screen to avoid thrash
+    system(CLEAR);
     //* set array
     char array_empit[(Block::SIZE_X*Block::SIZE_Y)];
     char array_blocked[(Block::SIZE_X*Block::SIZE_Y)];

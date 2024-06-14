@@ -28,8 +28,6 @@ protected:
 
     //*make all the full blocks walk back
     void swapObstaclesToFrontLines();
-    //* clear screen
-    void clearScrean();
 public:
     Level(Plane* plane, Block* empit, Block* blocked);
     ~Level();
@@ -136,7 +134,7 @@ void Level::generateNewObstaclesLine()
     for (size_t i = 0; i < LEVEL_HEIGTH; i++)
     {
 
-        int r =(rand() % 4);
+        int r =(rand() % 3);
         if (r != 0)
         {
             pass_col++;
@@ -172,11 +170,6 @@ void Level::generateNewObstaclesLine()
     
 };
 
-void Level::clearScrean()
-{
-    system(CLEAR);
-};
-
 void Level::printBord()
 {
     char c = ((char)CHAR_BORD);
@@ -190,7 +183,7 @@ void Level::printBord()
 void Level::returnScreen()
 {
     //*clear
-    clearScrean();
+    clearScreen();
     //* bord
     printBord();
     //*print the path
