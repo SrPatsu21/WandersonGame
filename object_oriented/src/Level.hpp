@@ -24,7 +24,7 @@ protected:
     int score;
     bool runnig;
 
-    //TODO random generation
+    //* rand the last colum
     void generateNewObstaclesLine();
 
     //*make all the full blocks walk back
@@ -53,6 +53,7 @@ Level::Level(Plane* plane, Block* empit, Block* blocked)
     this->empit = empit;
     this->blocked = blocked;
     this->plane = plane;
+    this->score = 0;
     //* centralize
     this->plane->setPos(2, (LEVEL_HEIGTH/2));
 
@@ -188,6 +189,8 @@ void Level::returnScreen()
 {
     //*clear
     clearScreen();
+    //* score
+    std::cout << "score:" << score << std::endl;
     //* bord
     printBord();
     //*print the path
@@ -211,6 +214,10 @@ void Level::updatePath()
     generateNewObstaclesLine();
     swapObstaclesToFrontLines();
 };
+void Level::updatePlane()
+{
+    // getchar();
+};
 
 void Level::run()
 {
@@ -219,9 +226,9 @@ void Level::run()
     while(runnig)
     {
         count++;
-        score++;
         if (count == 5)
         {
+            score++;
             count = 0;
             updatePath();
         }
