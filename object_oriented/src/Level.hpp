@@ -21,6 +21,7 @@ protected:
     const int LEVEL_WIDTH = 28 + 1;
     const int LEVEL_HEIGTH = 8;
     const int LEVEL_WH = LEVEL_WIDTH * LEVEL_HEIGTH;
+    int score;
     bool runnig;
 
     //TODO random generation
@@ -66,6 +67,8 @@ Level::Level(Plane* plane, Block* empit, Block* blocked)
             this->level[(i*LEVEL_WIDTH+j)] = empit;
         }
     }
+    //* inset plane
+    this->level[(plane->getY()*LEVEL_WIDTH+plane->getX())] = plane->getPlane();
     //* random seed
     srand(time(NULL));
     //* creat path
@@ -80,7 +83,7 @@ Level::~Level()
 void Level::swapObstaclesToFrontLines()
 {
     //* if plane is no colliding
-    if (level[plane->getY()*LEVEL_WIDTH+plane->getX()] != blocked)
+    if (level[plane->getY()*LEVEL_WIDTH+(plane->getX()+1)] != blocked)
     {
         for (size_t i = 0; i < LEVEL_HEIGTH; i++)
         {
@@ -103,6 +106,7 @@ void Level::swapObstaclesToFrontLines()
     }else
     {
         //! end game, lose
+        runnig = false;
         for (size_t i = 0; i < LEVEL_HEIGTH; i++)
         {
             for (size_t j = 0; j < LEVEL_WIDTH; j++)
@@ -212,19 +216,14 @@ void Level::run()
 {
     int count = 0;
     runnig = true;
-    int test = 0;
     while(runnig)
     {
         count++;
-        test++;
+        score++;
         if (count == 5)
         {
             count = 0;
             updatePath();
-        }
-        if (test > 50)
-        {
-            runnig = false;
         }
         
         returnScreen();

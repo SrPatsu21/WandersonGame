@@ -36,6 +36,12 @@ int main()
     //* run thread
     t_level_updata.join();
     
+    //* test area
+
+    // plane->getPlane()->printLine(0);
+    // plane->getPlane()->printLine(1);
+    // plane->getPlane()->printLine(2);
+
     //* delete all
     delete level;
     delete empit_block;
