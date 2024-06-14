@@ -5,7 +5,9 @@ Plane::Plane(int x, int y)
     this->x = x;
     this->y = y;
     //* models
-    char array_plane[(Block::SIZE_X*Block::SIZE_Y)+1] = "  |  --+-D  |  ";
+    // char array_plane[(Block::SIZE_X*Block::SIZE_Y)+1] = "  |  --+-D  |  ";
+    char array_plane[(Block::SIZE_X*Block::SIZE_Y)+1] = "   | --+-D   | ";
+    // char array_plane[(Block::SIZE_X*Block::SIZE_Y)+1] = " \\ \\ ====> / / ";
     char array_plane_fall[(Block::SIZE_X*Block::SIZE_Y)+1] = " * * * * * * * ";
     //*plane on game
     this->plane = new Block(array_plane);
