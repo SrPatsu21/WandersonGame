@@ -6,55 +6,25 @@
 
 int main()
 {
-    // Plane* plane = new Plane(0, 0);
-    // plane->getPlane()->printLine(0);
-    // std::cout << std::endl;
-    // plane->getPlane()->printLine(1);
-    // std::cout << std::endl;
-    // plane->getPlane()->printLine(2);
 
     char array_empit[(Block::SIZE_X*Block::SIZE_Y)];
     char array_blocked[(Block::SIZE_X*Block::SIZE_Y)];
+
     for (size_t i = 0; i < (Block::SIZE_X*Block::SIZE_Y); i++)
     {
         array_empit[i] = ((char)CHAR_FREE);
         array_blocked[i] = ((char)CHAR_BLOCK);
     }
-    
-    Level* level = new Level(new Plane(0, 0), new Block(array_empit), new Block(array_blocked));
-    level->updatePath();
-    level->updatePath();
-    level->updatePath();
-    level->updatePath();
-    level->updatePath();
-    level->updatePath();
-    level->updatePath();
-    level->updatePath();
-    level->updatePath();
-        level->updatePath();
-    level->updatePath();
-    level->updatePath();
-    level->updatePath();
-    level->updatePath();
-    level->updatePath();
-    level->updatePath();
-    level->updatePath();
-    level->updatePath();
-        level->updatePath();
-    level->updatePath();
-    level->updatePath();
-    level->updatePath();
-    level->updatePath();
-    level->updatePath();
-    level->updatePath();
-    level->updatePath();
-    level->updatePath();
+    Plane* plane = new Plane(0, 0);
+    Block* empit_block = new Block(array_empit);
+    Block* blocked_block = new Block(array_blocked);
 
-
-
-    level->returnScreen();
+    Level* level = new Level(plane, empit_block, blocked_block);
+    level->run();
     
     delete level;
+    delete empit_block;
+    delete blocked_block;
     std::cout << std::endl;
     return 0;
 }

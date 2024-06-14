@@ -1,21 +1,19 @@
 #ifndef BASE_HPP
 #define BASE_HPP
 
-// #include <time.h>//rand
-// #include <pthread.h> // Multithreading
 #define CHAR_FREE ' '
 #define CHAR_WALL '|'
 
 #ifdef __linux__ 
+    #include<unistd.h> //* sleep
     #define CLEAR "clear"
-    #define SLEEP_TIME 500000
-    #define KEY_SLEEP_TIME 100000
+    #define SLEEP_TIME 100000
     #define CHAR_BORD '>'
     #define CHAR_BLOCK '#'
 
 #elif _WIN32
-    // #include <windows.h>
-    // #include <conio.h>
+
+    #include <windows.h> //* sleep
     #define CLEAR "cls"
     #define SLEEP_TIME 500
     #define KEY_SLEEP_TIME 100

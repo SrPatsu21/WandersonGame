@@ -28,6 +28,8 @@ protected:
 
     //*make all the full blocks walk back
     void swapObstaclesToFrontLines();
+    //* clear screen
+    void clearScrean();
 public:
     Level(Plane* plane, Block* empit, Block* blocked);
     ~Level();
@@ -41,6 +43,8 @@ public:
     void printBord();
     //TODO plane change position, player
     void updatePlane();
+    //* game control
+    void run();
 
 };
 
@@ -55,6 +59,7 @@ Level::Level(Plane* plane, Block* empit, Block* blocked)
 
     //*alloc the Level
     this->level = (Block**) std::malloc(LEVEL_WH*sizeof(Block*));    
+
     //*set lvl empit
     for (size_t i = 0; i < LEVEL_HEIGTH; i++)
     {
@@ -71,13 +76,6 @@ Level::Level(Plane* plane, Block* empit, Block* blocked)
 
 Level::~Level()
 {
-    for (size_t i = 0; i < LEVEL_HEIGTH; i++)
-    {
-        for (size_t j = 0; j < (LEVEL_WIDTH+1); j++)
-        {
-            delete this->level[(i*LEVEL_WIDTH+j)];
-        }
-    }
     delete this->level;
 };
 
@@ -174,6 +172,11 @@ void Level::generateNewObstaclesLine()
     
 };
 
+void Level::clearScrean()
+{
+    system(CLEAR);
+};
+
 void Level::printBord()
 {
     char c = ((char)CHAR_BORD);
@@ -186,6 +189,9 @@ void Level::printBord()
 
 void Level::returnScreen()
 {
+    //*clear
+    clearScrean();
+    //* bord
     printBord();
     //*print the path
     for (size_t i = 0; i < LEVEL_HEIGTH; i++)
@@ -205,9 +211,32 @@ void Level::returnScreen()
 
 void Level::updatePath()
 {
-    
     generateNewObstaclesLine();
     swapObstaclesToFrontLines();
 };
+
+void Level::run()
+{
+    int count = 0;
+    runnig = true;
+    int test = 0;
+    while(runnig)
+    {
+        count++;
+        test++;
+        if (count == 5)
+        {
+            count = 0;
+            updatePath();
+        }
+        if (test > 50)
+        {
+            runnig = false;
+        }
+        
+        returnScreen();
+        usleep(SLEEP_TIME);
+    }
+}
 
 #endif 
