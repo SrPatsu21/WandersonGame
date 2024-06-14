@@ -3,10 +3,16 @@
 #include "./Level.hpp"
 #include "./Plane.hpp"
 #include <iostream>
+#include <thread>
+
+auto gameRun(Level* level)
+{
+    level->run();
+}
 
 int main()
 {
-
+    //* set array
     char array_empit[(Block::SIZE_X*Block::SIZE_Y)];
     char array_blocked[(Block::SIZE_X*Block::SIZE_Y)];
 
@@ -15,13 +21,20 @@ int main()
         array_empit[i] = ((char)CHAR_FREE);
         array_blocked[i] = ((char)CHAR_BLOCK);
     }
+    //* define blocks
     Plane* plane = new Plane(0, 0);
     Block* empit_block = new Block(array_empit);
     Block* blocked_block = new Block(array_blocked);
-
+    //* create level
     Level* level = new Level(plane, empit_block, blocked_block);
-    level->run();
+
+    //* create thread
+    std::thread t_level_updata(gameRun, level);
+
+    //* run thread
+    t_level_updata.join();
     
+    //* delete all
     delete level;
     delete empit_block;
     delete blocked_block;
