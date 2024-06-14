@@ -21,16 +21,20 @@ protected:
     const int LEVEL_WIDTH = 28 + 1;
     const int LEVEL_HEIGTH = 8;
     const int LEVEL_WH = LEVEL_WIDTH * LEVEL_HEIGTH;
+    int difficult;
     int score;
     bool runnig;
+    char player_move;
 
     //* rand the last colum
     void generateNewObstaclesLine();
 
     //*make all the full blocks walk back
     void swapObstaclesToFrontLines();
+    //TODO plane change position, player
+    void updatePlane(char key);
 public:
-    Level(Plane* plane, Block* empit, Block* blocked);
+    Level(int difficult, Plane* plane, Block* empit, Block* blocked);
     ~Level();
 
     //* print screen
@@ -40,20 +44,21 @@ public:
 
     //*print bord
     void printBord();
-    //TODO plane change position, player
-    void updatePlane();
-    //* game control
+    //* game flux
     void run();
-
+    //* chat key
+    void playerControl();
 };
 
-Level::Level(Plane* plane, Block* empit, Block* blocked)
+Level::Level(int difficult, Plane* plane, Block* empit, Block* blocked)
 {
     //*set lvl parameters
     this->empit = empit;
     this->blocked = blocked;
     this->plane = plane;
     this->score = 0;
+    this->player_move = '\0';
+    this->difficult = difficult;
     //* centralize
     this->plane->setPos(2, (LEVEL_HEIGTH/2));
 
@@ -90,7 +95,8 @@ void Level::swapObstaclesToFrontLines()
         {
             for (size_t j = 0; j < LEVEL_WIDTH; j++)
             {
-                //*plane cant be moved back
+                //* plane cant be moved back
+                //* plane cant be overwrited
                 if (plane->getPlane() != this->level[(i*LEVEL_WIDTH+j)])
                 {
                     //*plane cant be duplicated
@@ -214,9 +220,67 @@ void Level::updatePath()
     generateNewObstaclesLine();
     swapObstaclesToFrontLines();
 };
-void Level::updatePlane()
+
+void Level::updatePlane(char key)
 {
-    // getchar();
+    bool isvalidmove = false;
+    if ('w' == key || 'W' == key)
+    {
+        if (0 < plane->getY())
+        {
+            isvalidmove = true;
+            level[(plane->getY()*LEVEL_WIDTH+plane->getX())] = empit;
+            plane->subYPos();     
+        }
+        
+    }else if('s' == key || 'S' == key)
+    {
+        if ((LEVEL_HEIGTH-1) > plane->getY())
+        {
+            isvalidmove = true;
+            level[(plane->getY()*LEVEL_WIDTH+plane->getX())] = empit;
+            plane->addYPos();
+        }
+
+    }else if('a' == key || 'A' == key)
+    {
+        if (1 < plane->getX())
+        {
+            isvalidmove = true;
+            level[(plane->getY()*LEVEL_WIDTH+plane->getX())] = empit;
+            plane->subXPos();
+        }
+    }else if('d' == key || 'D' == key)
+    {
+        if ((LEVEL_WIDTH-1) > plane->getX())
+        {
+            isvalidmove = true;
+            level[(plane->getY()*LEVEL_WIDTH+plane->getX())] = empit;
+            plane->addXPos();
+        }
+    }
+
+    if (isvalidmove)
+    {
+        if (level[((plane->getY())*LEVEL_WIDTH+(plane->getX()))] != blocked)
+        {
+            level[((plane->getY())*LEVEL_WIDTH+(plane->getX()))] = plane->getPlane();
+        }else
+        {
+            runnig = false;
+            level[((plane->getY())*LEVEL_WIDTH+(plane->getX()))] = plane->getPlaneFall();
+        }    
+    }
+
+    this->player_move = '\0';
+};
+
+void Level::playerControl()
+{
+    while (runnig)
+    {
+        this->player_move = ((char)getKeyChar());
+    }
 };
 
 void Level::run()
@@ -226,16 +290,17 @@ void Level::run()
     while(runnig)
     {
         count++;
-        if (count == 5)
+        updatePlane(this->player_move);
+        if (count == difficult)
         {
             score++;
             count = 0;
             updatePath();
         }
-        
         returnScreen();
         usleep(SLEEP_TIME);
     }
+    returnScreen();
 }
 
 #endif 

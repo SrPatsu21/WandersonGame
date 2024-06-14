@@ -18,6 +18,7 @@
 #elif _WIN32
 
     #include <windows.h> //* sleep
+    #include <conio.h> //* getchar & getch
     #define CLEAR "cls"
     #define SLEEP_TIME 100
     #define CHAR_BORD 205
@@ -41,10 +42,10 @@
         Sleep(time);
     };
 
-    // int getKeyChar()
-    // {
-    //     return getch();
-    // }
+    int getKeyChar(void)
+    {
+        return getch();
+    }
 #else
 
 #endif

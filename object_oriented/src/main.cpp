@@ -9,6 +9,10 @@ auto gameRun(Level* level)
 {
     level->run();
 }
+auto playerControl(Level* level)
+{
+    level->playerControl();
+}
 
 int main()
 {
@@ -28,19 +32,15 @@ int main()
     Block* empit_block = new Block(array_empit);
     Block* blocked_block = new Block(array_blocked);
     //* create level
-    Level* level = new Level(plane, empit_block, blocked_block);
+    Level* level = new Level(5, plane, empit_block, blocked_block);
 
     //* create thread
     std::thread t_level_updata(gameRun, level);
+    std::thread t_player_control(playerControl, level);
 
     //* run thread
     t_level_updata.join();
-    
-    //* test area
-
-    // plane->getPlane()->printLine(0);
-    // plane->getPlane()->printLine(1);
-    // plane->getPlane()->printLine(2);
+    t_player_control.join();
 
     //* delete all
     delete level;
