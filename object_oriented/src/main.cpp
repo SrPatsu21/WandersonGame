@@ -17,7 +17,7 @@ auto playerControl(Level* level)
 int main()
 {
     //* clear screen to avoid thrash
-    system(CLEAR);
+    clearScreen();
     //* set array
     char array_empit[(Block::SIZE_X*Block::SIZE_Y)];
     char array_blocked[(Block::SIZE_X*Block::SIZE_Y)];
